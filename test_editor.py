@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QKeySequence, QPalette, QColor
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -25,8 +25,12 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QMenu,
+    QStyleFactory,
 )
 
+import platform
+import ctypes
+from ctypes import wintypes
 
 def build_markdown_from_test(test: dict) -> str:
     """Render a Markdown-ish view of a test dict."""
@@ -113,6 +117,7 @@ class TestEditorWindow(QMainWindow):
 
         self.save_act = QAction("Save", self)
         self.save_act.triggered.connect(self.save_current_test)
+        self.save_act.setShortcut(QKeySequence.StandardKey.Save)
 
         self.exit_act = QAction("Exit", self)
         self.exit_act.triggered.connect(self.close)
@@ -135,7 +140,7 @@ class TestEditorWindow(QMainWindow):
         # Left: test list
         self.test_list = QListWidget()
         self.test_list.itemSelectionChanged.connect(self.on_test_selection_changed)
-        # Context menu (right-click) for delete
+        # Context menu (right-click) for duplicate/delete
         self.test_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.test_list.customContextMenuRequested.connect(self.on_test_list_context_menu)
         splitter.addWidget(self.test_list)
@@ -452,16 +457,19 @@ class TestEditorWindow(QMainWindow):
     # ----- Context menu on test list -----
 
     def on_test_list_context_menu(self, pos):
-        """Right-click context menu for deleting a test + file."""
+        """Right-click context menu for duplicate/delete a test + file."""
         item = self.test_list.itemAt(pos)
         if not item:
             return
 
         menu = QMenu(self)
-        delete_act = menu.addAction("Delete Test")
+        dup_act = menu.addAction("Duplicate Test")
+        del_act = menu.addAction("Delete Test")
         action = menu.exec(self.test_list.viewport().mapToGlobal(pos))
-        if action == delete_act:
+        if action == del_act:
             self._delete_test_item(item)
+        elif action == dup_act:
+            self._duplicate_test_item(item)
 
     def _delete_test_item(self, item: QListWidgetItem):
         path_str = item.data(Qt.ItemDataRole.UserRole)
@@ -507,6 +515,68 @@ class TestEditorWindow(QMainWindow):
         if count > 0:
             new_row = min(row, count - 1)
             self.test_list.setCurrentRow(new_row)
+
+    def _duplicate_test_item(self, item: QListWidgetItem):
+        """Duplicate the selected test into a new JSON file and load it."""
+        path_str = item.data(Qt.ItemDataRole.UserRole)
+        if not path_str or not self.current_folder:
+            return
+        src_path = Path(path_str)
+
+        try:
+            with src_path.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to read source test:\n{src_path}\n\n{e}")
+            return
+
+        # Deep copy
+        new_test = json.loads(json.dumps(data))
+
+        old_no = (new_test.get("test_no") or "").strip()
+        new_no = self._suggest_next_test_no()
+        new_test["last_test_no"] = old_no
+        new_test["test_no"] = new_no
+
+        # Append a revision note about duplication
+        rh = new_test.get("revision_history")
+        if not isinstance(rh, list):
+            rh = []
+        rh.append(
+            {
+                "rev": "-",
+                "rev_date": "",
+                "description": f"Duplicated from test {old_no or 'N/A'}",
+                "rev_by": "",
+            }
+        )
+        new_test["revision_history"] = rh
+
+        # Determine new filename
+        base_name = self._slugify_name(new_test.get("test_name", "new_test"))
+        candidate = f"TB_{new_no}_{base_name}.json"
+        dst_path = self.current_folder / candidate
+        i = 2
+        while dst_path.exists():
+            candidate = f"TB_{new_no}_{base_name}_{i}.json"
+            dst_path = self.current_folder / candidate
+            i += 1
+
+        # Write new file
+        try:
+            with dst_path.open("w", encoding="utf-8") as f:
+                json.dump(new_test, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to write duplicated test:\n{dst_path}\n\n{e}")
+            return
+
+        # Reload folder and select the new item
+        self.load_tests_from_folder(self.current_folder)
+        for i in range(self.test_list.count()):
+            it = self.test_list.item(i)
+            if it and it.data(Qt.ItemDataRole.UserRole) == str(dst_path):
+                self.test_list.setCurrentItem(it)
+                break
 
     # ----- New Test -----
 
@@ -745,11 +815,68 @@ class TestEditorWindow(QMainWindow):
             return
         self._sync_ex_from_table()
 
+def enable_windows_dark_titlebar(window: QWidget):
+    """Ask Windows 10/11 to use a dark title bar for this window."""
+    if platform.system() != "Windows":
+        return
+
+    try:
+        hwnd = wintypes.HWND(int(window.winId()))
+
+        # Windows 10 1809+ / 11: DWMWA_USE_IMMERSIVE_DARK_MODE = 20 (sometimes 19)
+        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+
+        value = ctypes.c_int(1)
+        dwmapi = ctypes.windll.dwmapi
+
+        # Try attribute 20, fall back to 19 if needed
+        res = dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            ctypes.c_int(DWMWA_USE_IMMERSIVE_DARK_MODE),
+            ctypes.byref(value),
+            ctypes.sizeof(value),
+        )
+        if res != 0:
+            # Fallback for some builds
+            DWMWA_USE_IMMERSIVE_DARK_MODE = 19
+            dwmapi.DwmSetWindowAttribute(
+                hwnd,
+                ctypes.c_int(DWMWA_USE_IMMERSIVE_DARK_MODE),
+                ctypes.byref(value),
+                ctypes.sizeof(value),
+            )
+    except Exception:
+        # If anything fails, just ignore and keep running
+        pass
+
+def apply_dark_palette(app: QApplication):
+    """Apply a simple dark theme to the whole application."""
+    app.setStyle(QStyleFactory.create("Fusion"))
+
+    palette = QPalette()
+    palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
+    palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.white)
+    palette.setColor(QPalette.ColorRole.Base, QColor(35, 35, 35))
+    palette.setColor(QPalette.ColorRole.AlternateBase, QColor(53, 53, 53))
+    palette.setColor(QPalette.ColorRole.ToolTipBase, Qt.GlobalColor.white)
+    palette.setColor(QPalette.ColorRole.ToolTipText, Qt.GlobalColor.white)
+    palette.setColor(QPalette.ColorRole.Text, Qt.GlobalColor.white)
+    palette.setColor(QPalette.ColorRole.Button, QColor(53, 53, 53))
+    palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.white)
+    palette.setColor(QPalette.ColorRole.BrightText, Qt.GlobalColor.red)
+    palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
+    palette.setColor(QPalette.ColorRole.HighlightedText, Qt.GlobalColor.black)
+
+    app.setPalette(palette)
+
 
 def main():
     app = QApplication(sys.argv)
+    apply_dark_palette(app)
     win = TestEditorWindow()
     win.show()
+    enable_windows_dark_titlebar(win)
     sys.exit(app.exec())
 
 

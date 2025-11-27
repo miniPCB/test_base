@@ -1,0 +1,79 @@
+{
+  "test_name": "Off-State Leakage Measurement",
+  "test_no": "009",
+  "last_test_no": "008",
+  "purpose": "Measure off-state leakage current under specified bias conditions.",
+  "scope": "Applies to DUTs in off state with defined bias.",
+  "setup": "Configure DUT in off state. Use precision ammeter or DMM to measure leakage current.",
+  "procedure": "1. Set DUT to off state.\n2. Apply specified bias voltage.\n3. Measure leakage current.\n4. Repeat for multiple units and temperature conditions if required.",
+  "measurement": "Record leakage current for each condition.",
+  "acceptancecriteria": "Leakage current must be below specified maximum over tested conditions.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    },
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Duplicated from test 008",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [
+    "leakage",
+    "off-state",
+    "current measurement",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "Drain",
+      "role": "signal_source",
+      "schematic_ref": "TP_D",
+      "net": "DRAIN",
+      "description": "Leakage current path."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "DMM1",
+      "type": "multimeter",
+      "model": "Precision DMM",
+      "serial": "DMM_LEAK_001",
+      "location": "Bench 4",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "DMM1",
+      "mode": "current_dc",
+      "range": "10 nA",
+      "sampling": "average",
+      "other_settings": ""
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Off-state leakage current",
+      "target_value": "10",
+      "lower_limit": "0",
+      "upper_limit": "50",
+      "units": "nA",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "single_value",
+      "description": "Representative leakage measurement at 25 °C.",
+      "data_value": "12 nA",
+      "file_ref": "",
+      "notes": ""
+    }
+  ]
+}
