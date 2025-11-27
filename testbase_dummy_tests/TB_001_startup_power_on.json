@@ -1,0 +1,96 @@
+{
+  "test_name": "Power-On Startup Behavior",
+  "test_no": "001",
+  "last_test_no": "NA",
+  "purpose": "Verify that the DUT powers up cleanly and enters a defined steady state.",
+  "scope": "Applies to all Rev A1 DUTs assembled with nominal component values.",
+  "setup": "Connect DUT to adjustable DC supply and nominal resistive load. Configure oscilloscope to monitor V+, switch node, and gate drive.",
+  "procedure": "1. Set V+ to 0 V.\n2. Arm oscilloscope.\n3. Ramp V+ from 0 V to nominal operating voltage at 1 V/s.\n4. Observe startup waveforms.\n5. Repeat for three samples.",
+  "measurement": "Capture startup waveforms on V+, switch node, and gate drive. Record any overshoot/undershoot and startup time.",
+  "acceptancecriteria": "No abnormal oscillations. No voltage exceeds device absolute maximum ratings. DUT reaches steady state within 100 ms.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "startup",
+    "power-on",
+    "transient",
+    "switching",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "V+ input",
+      "role": "stimulus_source",
+      "schematic_ref": "TP1",
+      "net": "VPLUS",
+      "description": "External DC supply input."
+    },
+    {
+      "name": "Switch node",
+      "role": "signal_source",
+      "schematic_ref": "TP2",
+      "net": "SW_NODE",
+      "description": "Low-side GaN drain node."
+    },
+    {
+      "name": "Gate drive",
+      "role": "signal_source",
+      "schematic_ref": "TP3",
+      "net": "GATE",
+      "description": "Gate drive waveform for GaN FET."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "PS1",
+      "type": "power_supply",
+      "model": "Generic DC Supply",
+      "serial": "PS_STARTUP_001",
+      "location": "Bench 1",
+      "notes": ""
+    },
+    {
+      "id": "SCOPE1",
+      "type": "oscilloscope",
+      "model": "Generic 4-ch Scope",
+      "serial": "SC_STARTUP_001",
+      "location": "Bench 1",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "SCOPE1",
+      "mode": "ch1_voltage",
+      "range": "20 V/div",
+      "sampling": "1 GS/s",
+      "other_settings": "Ch1 on V+, Ch2 on SW_NODE, Ch3 on GATE."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Startup time",
+      "target_value": "0.05",
+      "lower_limit": "0.00",
+      "upper_limit": "0.10",
+      "units": "s",
+      "notes": "Time from V+ reaching 90% of nominal until outputs are stable."
+    }
+  ],
+  "example_data": [
+    {
+      "type": "scope_shot",
+      "description": "Representative power-on waveform.",
+      "data_value": "",
+      "file_ref": "examples/001_startup_scope.png",
+      "notes": "Captured at nominal conditions."
+    }
+  ]
+}

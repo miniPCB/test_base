@@ -1,0 +1,74 @@
+{
+  "test_name": "Thermal Rise at Maximum Load",
+  "test_no": "004",
+  "last_test_no": "003",
+  "purpose": "Measure case and hotspot temperature rise at maximum load under steady-state conditions.",
+  "scope": "Applies to DUTs mounted on reference PCB with specified airflow and ambient temperature.",
+  "setup": "Mount DUT on reference PCB. Place in controlled ambient chamber or use local temperature monitoring. Apply maximum load current.",
+  "procedure": "1. Set ambient temperature to 25 °C.\n2. Apply maximum load current.\n3. Allow system to reach thermal steady state.\n4. Measure case and hotspot temperatures.\n5. Repeat at 50 °C ambient if required.",
+  "measurement": "Record case temperature at specified reference point and any identified hotspots.",
+  "acceptancecriteria": "Temperatures must remain below component-rated limits with required margin.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "thermal",
+    "temperature rise",
+    "maximum load",
+    "GaN",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "Case reference",
+      "role": "signal_source",
+      "schematic_ref": "",
+      "net": "",
+      "description": "Case temperature measurement location."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "IR1",
+      "type": "thermal_camera",
+      "model": "Generic IR Camera",
+      "serial": "IR_TH_001",
+      "location": "Thermal Lab",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "IR1",
+      "mode": "thermal_image",
+      "range": "0–150 °C",
+      "sampling": "snapshot",
+      "other_settings": ""
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Case temperature at max load",
+      "target_value": "75",
+      "lower_limit": "0",
+      "upper_limit": "90",
+      "units": "°C",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "picture",
+      "description": "Thermal image at maximum load.",
+      "data_value": "",
+      "file_ref": "examples/004_thermal_image.png",
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "test_name": "UVLO Threshold Characterization",
+  "test_no": "002",
+  "last_test_no": "001",
+  "purpose": "Measure the undervoltage lockout (UVLO) rising and falling thresholds.",
+  "scope": "Applies to all DUTs with UVLO circuitry enabled.",
+  "setup": "Connect DUT to programmable supply. Configure to sweep V+ slowly through the UVLO range. Monitor UVLO status or switch node state.",
+  "procedure": "1. Start with V+ below UVLO threshold.\n2. Increase V+ in 0.1 V steps until DUT enables.\n3. Decrease V+ in 0.1 V steps until DUT disables.\n4. Repeat for three units.",
+  "measurement": "Record V+ at each enable and disable event. Compute average and spread across units.",
+  "acceptancecriteria": "UVLO rising and falling thresholds must meet design specification with appropriate hysteresis.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "UVLO",
+    "threshold",
+    "hysteresis",
+    "lockout",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "V+ input",
+      "role": "stimulus_source",
+      "schematic_ref": "TP1",
+      "net": "VPLUS",
+      "description": "Supply swept through UVLO threshold."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "PS1",
+      "type": "power_supply",
+      "model": "Precision Supply",
+      "serial": "PS_UVLO_001",
+      "location": "Bench 1",
+      "notes": "Used for fine V+ steps."
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "PS1",
+      "mode": "voltage_program",
+      "range": "0–20 V",
+      "sampling": "manual steps",
+      "other_settings": "0.1 V steps, dwell 1 s per step."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "UVLO rising threshold",
+      "target_value": "8.0",
+      "lower_limit": "7.5",
+      "upper_limit": "8.5",
+      "units": "V",
+      "notes": ""
+    },
+    {
+      "parameter": "UVLO falling threshold",
+      "target_value": "7.0",
+      "lower_limit": "6.5",
+      "upper_limit": "7.5",
+      "units": "V",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "data_array",
+      "description": "UVLO thresholds across three units.",
+      "data_value": "[7.9, 8.1, 8.0] V rising; [7.1, 6.9, 7.0] V falling",
+      "file_ref": "",
+      "notes": ""
+    }
+  ]
+}

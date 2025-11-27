@@ -1,0 +1,90 @@
+{
+  "test_name": "OVLO Transient Behavior at Maximum Load",
+  "test_no": "003",
+  "last_test_no": "002",
+  "purpose": "Verify safe operation and transient behavior when V+ exceeds the overvoltage lockout (OVLO) threshold at maximum load.",
+  "scope": "Applies to all DUTs with OVLO enabled and rated for maximum load current.",
+  "setup": "Connect DUT to maximum rated load. Use programmable supply to sweep V+ through OVLO range. Monitor switch node and sensitive component nodes with an oscilloscope.",
+  "procedure": "1. Set load to maximum rated current.\n2. Starting from nominal V+, ramp V+ upward through the OVLO threshold.\n3. Capture switch node and sensitive nodes during OVLO events.\n4. Repeat for multiple V+ ramp rates if applicable.",
+  "measurement": "Measure overshoot/undershoot on switch node and other sensitive nodes. Record any abnormal behavior or fault events.",
+  "acceptancecriteria": "Voltages must not exceed absolute maximum ratings. No sustained oscillations or unstable behavior.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "OVLO",
+    "overvoltage",
+    "transient",
+    "maximum load",
+    "GaN",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "V+ input",
+      "role": "stimulus_source",
+      "schematic_ref": "TP1",
+      "net": "VPLUS",
+      "description": "Supply swept through OVLO threshold."
+    },
+    {
+      "name": "Switch node",
+      "role": "signal_source",
+      "schematic_ref": "TP2",
+      "net": "SW_NODE",
+      "description": "Observed for overshoot/undershoot."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "PS1",
+      "type": "power_supply",
+      "model": "High Power Supply",
+      "serial": "PS_OVLO_001",
+      "location": "Bench 2",
+      "notes": ""
+    },
+    {
+      "id": "SCOPE1",
+      "type": "oscilloscope",
+      "model": "High Bandwidth Scope",
+      "serial": "SC_OVLO_001",
+      "location": "Bench 2",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "SCOPE1",
+      "mode": "ch1_voltage",
+      "range": "50 V/div",
+      "sampling": "2.5 GS/s",
+      "other_settings": "Ch1 on SW_NODE with high-voltage probe."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Switch node overshoot",
+      "target_value": "0",
+      "lower_limit": "0",
+      "upper_limit": "80",
+      "units": "V",
+      "notes": "Must be below GaN FET VDS max including ringing."
+    }
+  ],
+  "example_data": [
+    {
+      "type": "scope_shot",
+      "description": "Representative OVLO transient at max load.",
+      "data_value": "",
+      "file_ref": "examples/003_ovlo_transient_scope.png",
+      "notes": ""
+    }
+  ]
+}

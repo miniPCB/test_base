@@ -1,0 +1,74 @@
+{
+  "test_name": "Short-Circuit Protection",
+  "test_no": "007",
+  "last_test_no": "006",
+  "purpose": "Verify that the DUT protects itself and external circuitry under short-circuit conditions.",
+  "scope": "Applies to DUTs with built-in short-circuit or overcurrent protection.",
+  "setup": "Configure DUT with short-circuit path at output. Use current-limited supply and fast protection monitoring.",
+  "procedure": "1. Set current limit to safe maximum.\n2. Apply short circuit condition at output.\n3. Enable DUT and capture current and voltage during event.\n4. Verify proper protection response.",
+  "measurement": "Measure peak fault current and time to protection action.",
+  "acceptancecriteria": "Fault current and duration must be within specified limits. DUT must not be damaged.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "short circuit",
+    "overcurrent",
+    "protection",
+    "fault",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "Output node",
+      "role": "stimulus_source",
+      "schematic_ref": "TP_OUT",
+      "net": "OUT",
+      "description": "Location of intentional short."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "PS1",
+      "type": "power_supply",
+      "model": "Current-Limited Supply",
+      "serial": "PS_SC_001",
+      "location": "Bench 3",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "PS1",
+      "mode": "current_limit",
+      "range": "0–20 A",
+      "sampling": "fast trip",
+      "other_settings": "Limit set per design spec."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Peak short-circuit current",
+      "target_value": "15",
+      "lower_limit": "0",
+      "upper_limit": "20",
+      "units": "A",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "scope_shot",
+      "description": "Short-circuit event showing current and voltage.",
+      "data_value": "",
+      "file_ref": "examples/007_short_circuit_scope.png",
+      "notes": ""
+    }
+  ]
+}

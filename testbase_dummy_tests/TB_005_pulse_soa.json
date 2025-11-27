@@ -1,0 +1,81 @@
+{
+  "test_name": "Pulsed SOA Check",
+  "test_no": "005",
+  "last_test_no": "004",
+  "purpose": "Verify that pulsed operation stays within the device safe operating area (SOA).",
+  "scope": "Applies to DUTs in pulsed load applications.",
+  "setup": "Configure programmable load or pulse generator to apply controlled current pulses while monitoring VDS and IDS.",
+  "procedure": "1. Set up pulse generator per application conditions.\n2. Apply pulses at specified duty cycle and frequency.\n3. Monitor VDS and IDS during pulses.\n4. Compare against published SOA curves.",
+  "measurement": "Measure peak VDS and IDS for each pulse condition.",
+  "acceptancecriteria": "All operating points must remain within derated SOA with margin.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "SOA",
+    "pulsed load",
+    "current pulse",
+    "safe operating area",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "Drain",
+      "role": "signal_source",
+      "schematic_ref": "TP_D",
+      "net": "DRAIN",
+      "description": "Drain voltage measurement."
+    },
+    {
+      "name": "Source",
+      "role": "signal_return",
+      "schematic_ref": "TP_S",
+      "net": "SOURCE",
+      "description": "Source current return."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "PG1",
+      "type": "pulse_generator",
+      "model": "Generic Pulse Gen",
+      "serial": "PG_SOA_001",
+      "location": "Bench 3",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "PG1",
+      "mode": "current_pulse",
+      "range": "0–20 A",
+      "sampling": "repetitive",
+      "other_settings": "Duty cycle and pulse width per spec."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Peak IDS",
+      "target_value": "10",
+      "lower_limit": "0",
+      "upper_limit": "15",
+      "units": "A",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "scope_shot",
+      "description": "Pulse waveform with VDS and IDS.",
+      "data_value": "",
+      "file_ref": "examples/005_pulse_soa_scope.png",
+      "notes": ""
+    }
+  ]
+}

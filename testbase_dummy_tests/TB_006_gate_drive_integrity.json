@@ -1,0 +1,74 @@
+{
+  "test_name": "Gate Drive Integrity",
+  "test_no": "006",
+  "last_test_no": "005",
+  "purpose": "Verify that the gate drive waveform meets required amplitude, timing, and slew rate under load.",
+  "scope": "Applies to all DUTs using the specified gate driver circuit.",
+  "setup": "Connect DUT under normal load. Probe gate at the FET gate pad with appropriate probe and bandwidth.",
+  "procedure": "1. Operate DUT at nominal input voltage and load.\n2. Capture gate drive waveforms during switching.\n3. Repeat at minimum and maximum input voltages.",
+  "measurement": "Measure gate rise/fall times, peak gate voltage, and any ringing.",
+  "acceptancecriteria": "Gate voltage must remain within specified limits with acceptable rise/fall times and limited ringing.",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [
+    "gate drive",
+    "slew rate",
+    "ringing",
+    "GaN",
+    "TestBASE"
+  ],
+  "testpoints": [
+    {
+      "name": "Gate",
+      "role": "signal_source",
+      "schematic_ref": "TP_GATE",
+      "net": "GATE",
+      "description": "FET gate node."
+    }
+  ],
+  "measurement_equipment": [
+    {
+      "id": "SCOPE1",
+      "type": "oscilloscope",
+      "model": "High Bandwidth Scope",
+      "serial": "SC_GATE_001",
+      "location": "Bench 2",
+      "notes": ""
+    }
+  ],
+  "measurement_settings": [
+    {
+      "equipment_id": "SCOPE1",
+      "mode": "voltage",
+      "range": "5 V/div",
+      "sampling": "5 GS/s",
+      "other_settings": "Active probe recommended."
+    }
+  ],
+  "acceptance_thresholds": [
+    {
+      "parameter": "Peak gate voltage",
+      "target_value": "6",
+      "lower_limit": "5",
+      "upper_limit": "7",
+      "units": "V",
+      "notes": ""
+    }
+  ],
+  "example_data": [
+    {
+      "type": "scope_shot",
+      "description": "Gate drive waveform at nominal conditions.",
+      "data_value": "",
+      "file_ref": "examples/006_gate_drive_scope.png",
+      "notes": ""
+    }
+  ]
+}
