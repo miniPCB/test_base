@@ -1,5 +1,6 @@
 import sys
 import json
+import re
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
@@ -167,7 +168,7 @@ class TestEditorWindow(QMainWindow):
         self.resize(1400, 800)
 
         self.current_folder: Path | None = None
-        self.current_path: Path | None = None
+        self.current_path: Path | None = None  # None = new/unsaved test
         self.current_test: dict = {}
         self._suppress_updates = False
 
@@ -181,6 +182,9 @@ class TestEditorWindow(QMainWindow):
         self.open_folder_act = QAction("Open Test Folder…", self)
         self.open_folder_act.triggered.connect(self.open_folder)
 
+        self.new_test_act = QAction("New Test", self)
+        self.new_test_act.triggered.connect(self.new_test)
+
         self.save_act = QAction("Save", self)
         self.save_act.triggered.connect(self.save_current_test)
 
@@ -192,6 +196,7 @@ class TestEditorWindow(QMainWindow):
         file_menu = menubar.addMenu("&File")
         file_menu.addAction(self.open_folder_act)
         file_menu.addSeparator()
+        file_menu.addAction(self.new_test_act)
         file_menu.addAction(self.save_act)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_act)
@@ -237,7 +242,9 @@ class TestEditorWindow(QMainWindow):
         def add_text_field(key: str, label: str):
             edit = QTextEdit()
             self.field_edits[key] = edit
-            edit.textChanged.connect(lambda k=key: self.on_field_changed(k, self.field_edits[k].toPlainText()))
+            edit.textChanged.connect(
+                lambda k=key: self.on_field_changed(k, self.field_edits[k].toPlainText())
+            )
             form_layout.addRow(label, edit)
 
         add_line_field("test_name", "Test Name")
@@ -276,6 +283,48 @@ class TestEditorWindow(QMainWindow):
         kw_layout.addWidget(self.keywords_edit)
         tabs.addTab(kw_widget, "Keywords")
 
+    # ----- Helpers for naming / numbering -----
+
+    def _suggest_next_test_no(self) -> str:
+        """Look at the list labels and suggest the next numeric test number."""
+        max_no = 0
+        for i in range(self.test_list.count()):
+            item = self.test_list.item(i)
+            label = item.text()
+            # Label format: "NNN – Name"
+            no_part = label.split("–", 1)[0].strip()
+            if no_part.isdigit():
+                max_no = max(max_no, int(no_part))
+        if max_no <= 0:
+            return "001"
+        return f"{max_no + 1:03d}"
+
+    def _slugify_name(self, text: str) -> str:
+        """Create a filesystem-friendly name fragment from test_name."""
+        text = text.strip().lower()
+        text = re.sub(r"\s+", "_", text)
+        text = re.sub(r"[^a-z0-9_]+", "", text)
+        return text or "new_test"
+
+    def _add_or_update_list_item_for_current_test(self):
+        """Ensure the left list has an item for current_path and update its label."""
+        if not self.current_path:
+            return
+        path_str = str(self.current_path)
+        label = f"{self.current_test.get('test_no', '?')} – {self.current_test.get('test_name', 'Untitled')}"
+        # Try to find an existing item with this path
+        for i in range(self.test_list.count()):
+            item = self.test_list.item(i)
+            if item.data(Qt.ItemDataRole.UserRole) == path_str:
+                item.setText(label)
+                self.test_list.setCurrentItem(item)
+                return
+        # Not found → add new
+        item = QListWidgetItem(label)
+        item.setData(Qt.ItemDataRole.UserRole, path_str)
+        self.test_list.addItem(item)
+        self.test_list.setCurrentItem(item)
+
     # ----- Folder / file handling -----
 
     def open_folder(self):
@@ -289,6 +338,7 @@ class TestEditorWindow(QMainWindow):
         self.test_list.clear()
         self.current_path = None
         self.current_test = {}
+        self._suppress_updates = True
 
         for path in sorted(folder.glob("*.json")):
             try:
@@ -303,12 +353,16 @@ class TestEditorWindow(QMainWindow):
             except Exception as e:
                 print(f"Skipping {path}: {e}")
 
+        self._suppress_updates = False
+
         if self.test_list.count() == 0:
             QMessageBox.information(self, "No Tests Found", "No test JSON files found in this folder.")
         else:
             self.test_list.setCurrentRow(0)
 
     def on_test_selection_changed(self):
+        if self._suppress_updates:
+            return
         items = self.test_list.selectedItems()
         if not items:
             return
@@ -351,13 +405,103 @@ class TestEditorWindow(QMainWindow):
 
         self._suppress_updates = False
 
+    # ----- New Test -----
+
+    def new_test(self):
+        """Create a new in-memory test using the TestBASE template."""
+        if not self.current_folder:
+            QMessageBox.information(
+                self, "No Folder Open",
+                "Please open a test folder first (File → Open Test Folder…)."
+            )
+            return
+
+        # Simple template for a new test
+        next_no = self._suggest_next_test_no()
+        new_test = {
+            "test_name": "",
+            "test_no": next_no,
+            "last_test_no": "",
+            "purpose": "",
+            "scope": "",
+            "setup": "",
+            "procedure": "",
+            "measurement": "",
+            "acceptancecriteria": "",
+            "conclusion": "",
+            "revision_history": [
+                {
+                    "rev": "-",
+                    "rev_date": "",
+                    "description": "Initial release",
+                    "rev_by": ""
+                }
+            ],
+            "keywords": [],
+            "testpoints": [],
+            "measurement_equipment": [],
+            "measurement_settings": [],
+            "acceptance_thresholds": [],
+            "example_data": []
+        }
+
+        self.current_test = new_test
+        self.current_path = None  # unsaved
+        self._suppress_updates = True
+
+        # Clear selection to show we are editing a new, unsaved test
+        self.test_list.clearSelection()
+
+        # Populate UI from template
+        for key, widget in self.field_edits.items():
+            value = new_test.get(key, "") or ""
+            if isinstance(widget, QLineEdit):
+                widget.setText(value)
+            elif isinstance(widget, QTextEdit):
+                widget.setPlainText(value)
+
+        self.keywords_edit.setPlainText("")
+        self.variables_summary.setPlainText(build_variables_summary(new_test))
+        self.markdown_view.setPlainText(build_markdown_from_test(new_test))
+
+        self._suppress_updates = False
+
+    # ----- Save -----
+
     def save_current_test(self):
-        if not self.current_path or not self.current_test:
+        if not self.current_test:
             QMessageBox.information(self, "Nothing to Save", "No test is currently loaded.")
             return
+
+        if not self.current_folder:
+            QMessageBox.information(
+                self, "No Folder",
+                "Please open a test folder first (File → Open Test Folder…)."
+            )
+            return
+
+        # If this is a new/unsaved test, choose a filename
+        if self.current_path is None:
+            test_no = (self.current_test.get("test_no") or "").strip()
+            if not test_no.isdigit():
+                test_no = self._suggest_next_test_no()
+                self.current_test["test_no"] = test_no
+            base_name = self._slugify_name(self.current_test.get("test_name", "new_test"))
+            candidate = f"TB_{test_no}_{base_name}.json"
+            path = self.current_folder / candidate
+
+            i = 2
+            while path.exists():
+                candidate = f"TB_{test_no}_{base_name}_{i}.json"
+                path = self.current_folder / candidate
+                i += 1
+
+            self.current_path = path
+
         try:
             with self.current_path.open("w", encoding="utf-8") as f:
                 json.dump(self.current_test, f, indent=2, ensure_ascii=False)
+            self._add_or_update_list_item_for_current_test()
             QMessageBox.information(self, "Saved", f"Saved {self.current_path.name}")
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save {self.current_path}:\n{e}")
@@ -365,14 +509,14 @@ class TestEditorWindow(QMainWindow):
     # ----- Data binding -----
 
     def on_field_changed(self, key: str, value: str):
-        if self._suppress_updates:
+        if self._suppress_updates or not self.current_test:
             return
         self.current_test[key] = value
         # Live update of markdown
         self.markdown_view.setPlainText(build_markdown_from_test(self.current_test))
 
     def on_keywords_changed(self):
-        if self._suppress_updates:
+        if self._suppress_updates or not self.current_test:
             return
         text = self.keywords_edit.toPlainText()
         keywords = [line.strip() for line in text.splitlines() if line.strip()]
