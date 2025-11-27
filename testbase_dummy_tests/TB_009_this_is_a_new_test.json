@@ -17,7 +17,12 @@
       "rev_by": ""
     }
   ],
-  "keywords": [],
+  "keywords": [
+    "One",
+    "Word",
+    "Per",
+    "Line"
+  ],
   "testpoints": [],
   "measurement_equipment": [],
   "measurement_settings": [],

@@ -18,8 +18,12 @@ from PyQt6.QtWidgets import (
     QTextEdit,
     QPlainTextEdit,
     QVBoxLayout,
+    QHBoxLayout,
     QFileDialog,
     QMessageBox,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
 )
 
 
@@ -72,100 +76,19 @@ def build_markdown_from_test(test: dict) -> str:
     return "\n".join(lines)
 
 
-def build_variables_summary(test: dict) -> str:
-    """Build a human-readable text summary of test variables for the right pane."""
-    lines = []
-
-    # Testpoints
-    tps = test.get("testpoints", [])
-    lines.append("TESTPOINTS")
-    lines.append("----------")
-    if tps:
-        for tp in tps:
-            name = tp.get("name", "")
-            role = tp.get("role", "")
-            ref = tp.get("schematic_ref", "")
-            net = tp.get("net", "")
-            desc = tp.get("description", "")
-            lines.append(f"- {name} ({role}) [{ref}/{net}] - {desc}")
-    else:
-        lines.append("(none defined)")
-    lines.append("")
-
-    # Measurement equipment
-    eqs = test.get("measurement_equipment", [])
-    lines.append("MEASUREMENT EQUIPMENT")
-    lines.append("---------------------")
-    if eqs:
-        for eq in eqs:
-            eid = eq.get("id", "")
-            etype = eq.get("type", "")
-            model = eq.get("model", "")
-            serial = eq.get("serial", "")
-            loc = eq.get("location", "")
-            notes = eq.get("notes", "")
-            lines.append(f"- {eid}: {etype} {model} (SN {serial}), {loc} - {notes}")
-    else:
-        lines.append("(none defined)")
-    lines.append("")
-
-    # Measurement settings
-    msets = test.get("measurement_settings", [])
-    lines.append("MEASUREMENT SETTINGS")
-    lines.append("---------------------")
-    if msets:
-        for ms in msets:
-            eid = ms.get("equipment_id", "")
-            mode = ms.get("mode", "")
-            r = ms.get("range", "")
-            samp = ms.get("sampling", "")
-            other = ms.get("other_settings", "")
-            lines.append(f"- {eid}: mode={mode}, range={r}, sampling={samp}, {other}")
-    else:
-        lines.append("(none defined)")
-    lines.append("")
-
-    # Acceptance thresholds
-    ths = test.get("acceptance_thresholds", [])
-    lines.append("ACCEPTANCE THRESHOLDS")
-    lines.append("----------------------")
-    if ths:
-        for th in ths:
-            p = th.get("parameter", "")
-            tgt = th.get("target_value", "")
-            lo = th.get("lower_limit", "")
-            hi = th.get("upper_limit", "")
-            units = th.get("units", "")
-            notes = th.get("notes", "")
-            lines.append(f"- {p}: target={tgt} {units}, [{lo}, {hi}] {units} - {notes}")
-    else:
-        lines.append("(none defined)")
-    lines.append("")
-
-    # Example data
-    exs = test.get("example_data", [])
-    lines.append("EXAMPLE DATA")
-    lines.append("------------")
-    if exs:
-        for ex in exs:
-            t = ex.get("type", "")
-            d = ex.get("description", "")
-            v = ex.get("data_value", "")
-            f = ex.get("file_ref", "")
-            notes = ex.get("notes", "")
-            lines.append(f"- {t}: {d} value={v} file={f} - {notes}")
-    else:
-        lines.append("(none defined)")
-    lines.append("")
-
-    return "\n".join(lines)
+# Column definitions for variable tables
+TP_COLUMNS = ["name", "role", "schematic_ref", "net", "description"]
+EQ_COLUMNS = ["id", "type", "model", "serial", "location", "notes"]
+MS_COLUMNS = ["equipment_id", "mode", "range", "sampling", "other_settings"]
+TH_COLUMNS = ["parameter", "target_value", "lower_limit", "upper_limit", "units", "notes"]
+EX_COLUMNS = ["type", "description", "data_value", "file_ref", "notes"]
 
 
 class TestEditorWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("TestBASE Plan Editor (v0)")
-        self.resize(1400, 800)
+        self.resize(1600, 900)
 
         self.current_folder: Path | None = None
         self.current_path: Path | None = None  # None = new/unsaved test
@@ -218,11 +141,11 @@ class TestEditorWindow(QMainWindow):
         splitter.addWidget(center_tabs)
         splitter.setStretchFactor(1, 3)
 
-        # Right: variables, keywords
+        # Right: variable editors + keywords
         right_tabs = QTabWidget()
         self._create_right_panels(right_tabs)
         splitter.addWidget(right_tabs)
-        splitter.setStretchFactor(2, 2)
+        splitter.setStretchFactor(2, 3)
 
         self.setCentralWidget(splitter)
 
@@ -265,14 +188,56 @@ class TestEditorWindow(QMainWindow):
         self.markdown_view.setReadOnly(True)
         tabs.addTab(self.markdown_view, "Markdown Preview")
 
+    def _create_table_tab(self, parent_tabs: QTabWidget, title: str, columns: list[str],
+                          cell_changed_handler):
+        """Helper to create a tab with a table and add/remove buttons."""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        table = QTableWidget()
+        table.setColumnCount(len(columns))
+        table.setHorizontalHeaderLabels(columns)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.verticalHeader().setVisible(False)
+        table.setEditTriggers(QTableWidget.EditTrigger.AllEditTriggers)
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        add_btn = QPushButton("Add Row")
+        del_btn = QPushButton("Delete Row")
+        btn_row.addWidget(add_btn)
+        btn_row.addWidget(del_btn)
+        btn_row.addStretch()
+
+        layout.addWidget(table)
+        layout.addLayout(btn_row)
+
+        parent_tabs.addTab(widget, title)
+
+        # Connect signals
+        table.cellChanged.connect(cell_changed_handler)
+        add_btn.clicked.connect(lambda: self._add_row_to_table(table, columns, cell_changed_handler))
+        del_btn.clicked.connect(lambda: self._delete_row_from_table(table, columns, cell_changed_handler))
+
+        return table
+
     def _create_right_panels(self, tabs: QTabWidget):
-        # Variables summary (read-only)
-        var_widget = QWidget()
-        vlayout = QVBoxLayout(var_widget)
-        self.variables_summary = QPlainTextEdit()
-        self.variables_summary.setReadOnly(True)
-        vlayout.addWidget(self.variables_summary)
-        tabs.addTab(var_widget, "Variables")
+        # Variable tables
+        self.tp_table = self._create_table_tab(
+            tabs, "Testpoints", TP_COLUMNS, self.on_tp_cell_changed
+        )
+        self.eq_table = self._create_table_tab(
+            tabs, "Equipment", EQ_COLUMNS, self.on_eq_cell_changed
+        )
+        self.ms_table = self._create_table_tab(
+            tabs, "Settings", MS_COLUMNS, self.on_ms_cell_changed
+        )
+        self.th_table = self._create_table_tab(
+            tabs, "Thresholds", TH_COLUMNS, self.on_th_cell_changed
+        )
+        self.ex_table = self._create_table_tab(
+            tabs, "Examples", EX_COLUMNS, self.on_ex_cell_changed
+        )
 
         # Keywords editor
         kw_widget = QWidget()
@@ -282,6 +247,41 @@ class TestEditorWindow(QMainWindow):
         self.keywords_edit.textChanged.connect(self.on_keywords_changed)
         kw_layout.addWidget(self.keywords_edit)
         tabs.addTab(kw_widget, "Keywords")
+
+    # ----- Helpers for table row management -----
+
+    def _add_row_to_table(self, table: QTableWidget, columns: list[str], handler):
+        if self._suppress_updates:
+            return
+        self._suppress_updates = True
+        row = table.rowCount()
+        table.insertRow(row)
+        for col in range(len(columns)):
+            table.setItem(row, col, QTableWidgetItem(""))
+        self._suppress_updates = False
+        # Trigger a sync manually after adding a blank row
+        handler(row, 0)
+
+    def _delete_row_from_table(self, table: QTableWidget, columns: list[str], handler):
+        if self._suppress_updates:
+            return
+        row = table.currentRow()
+        if row < 0:
+            return
+        self._suppress_updates = True
+        table.removeRow(row)
+        self._suppress_updates = False
+        # After deletion we resync whole corresponding array from the table
+        if table is self.tp_table:
+            self._sync_tp_from_table()
+        elif table is self.eq_table:
+            self._sync_eq_from_table()
+        elif table is self.ms_table:
+            self._sync_ms_from_table()
+        elif table is self.th_table:
+            self._sync_th_from_table()
+        elif table is self.ex_table:
+            self._sync_ex_from_table()
 
     # ----- Helpers for naming / numbering -----
 
@@ -385,7 +385,7 @@ class TestEditorWindow(QMainWindow):
         self.current_test = data
         self._suppress_updates = True
 
-        # Populate fields
+        # Populate core fields
         for key, widget in self.field_edits.items():
             value = data.get(key, "") or ""
             if isinstance(widget, QLineEdit):
@@ -397,8 +397,8 @@ class TestEditorWindow(QMainWindow):
         keywords = data.get("keywords", [])
         self.keywords_edit.setPlainText("\n".join(keywords))
 
-        # Variables summary
-        self.variables_summary.setPlainText(build_variables_summary(data))
+        # Variable tables
+        self._populate_tables_from_test(data)
 
         # Markdown preview
         self.markdown_view.setPlainText(build_markdown_from_test(data))
@@ -461,7 +461,8 @@ class TestEditorWindow(QMainWindow):
                 widget.setPlainText(value)
 
         self.keywords_edit.setPlainText("")
-        self.variables_summary.setPlainText(build_variables_summary(new_test))
+        # Clear tables
+        self._populate_tables_from_test(new_test)
         self.markdown_view.setPlainText(build_markdown_from_test(new_test))
 
         self._suppress_updates = False
@@ -479,6 +480,13 @@ class TestEditorWindow(QMainWindow):
                 "Please open a test folder first (File → Open Test Folder…)."
             )
             return
+
+        # Sync variable arrays from tables into the dict
+        self._sync_tp_from_table()
+        self._sync_eq_from_table()
+        self._sync_ms_from_table()
+        self._sync_th_from_table()
+        self._sync_ex_from_table()
 
         # If this is a new/unsaved test, choose a filename
         if self.current_path is None:
@@ -506,7 +514,7 @@ class TestEditorWindow(QMainWindow):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save {self.current_path}:\n{e}")
 
-    # ----- Data binding -----
+    # ----- Data binding for core + keywords -----
 
     def on_field_changed(self, key: str, value: str):
         if self._suppress_updates or not self.current_test:
@@ -521,6 +529,96 @@ class TestEditorWindow(QMainWindow):
         text = self.keywords_edit.toPlainText()
         keywords = [line.strip() for line in text.splitlines() if line.strip()]
         self.current_test["keywords"] = keywords
+
+    # ----- Populate tables from test dict -----
+
+    def _populate_tables_from_test(self, test: dict):
+        # Helper to fill one table from an array of dicts
+        def fill_table(table: QTableWidget, cols: list[str], rows: list[dict]):
+            table.blockSignals(True)
+            table.setRowCount(0)
+            for row_data in rows:
+                row = table.rowCount()
+                table.insertRow(row)
+                for c, key in enumerate(cols):
+                    value = row_data.get(key, "")
+                    table.setItem(row, c, QTableWidgetItem(str(value)))
+            table.blockSignals(False)
+
+        fill_table(self.tp_table, TP_COLUMNS, test.get("testpoints", []))
+        fill_table(self.eq_table, EQ_COLUMNS, test.get("measurement_equipment", []))
+        fill_table(self.ms_table, MS_COLUMNS, test.get("measurement_settings", []))
+        fill_table(self.th_table, TH_COLUMNS, test.get("acceptance_thresholds", []))
+        fill_table(self.ex_table, EX_COLUMNS, test.get("example_data", []))
+
+    # ----- Sync helpers: tables -> dict -----
+
+    def _sync_array_from_table(self, table: QTableWidget, cols: list[str]) -> list[dict]:
+        rows_data: list[dict] = []
+        for row in range(table.rowCount()):
+            row_dict: dict = {}
+            empty = True
+            for c, key in enumerate(cols):
+                item = table.item(row, c)
+                text = item.text().strip() if item is not None else ""
+                if text:
+                    empty = False
+                row_dict[key] = text
+            if not empty:
+                rows_data.append(row_dict)
+        return rows_data
+
+    def _sync_tp_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["testpoints"] = self._sync_array_from_table(self.tp_table, TP_COLUMNS)
+
+    def _sync_eq_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["measurement_equipment"] = self._sync_array_from_table(self.eq_table, EQ_COLUMNS)
+
+    def _sync_ms_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["measurement_settings"] = self._sync_array_from_table(self.ms_table, MS_COLUMNS)
+
+    def _sync_th_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["acceptance_thresholds"] = self._sync_array_from_table(self.th_table, TH_COLUMNS)
+
+    def _sync_ex_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["example_data"] = self._sync_array_from_table(self.ex_table, EX_COLUMNS)
+
+    # ----- Handlers for cell changes (tables -> dict, live) -----
+
+    def on_tp_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_tp_from_table()
+
+    def on_eq_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_eq_from_table()
+
+    def on_ms_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_ms_from_table()
+
+    def on_th_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_th_from_table()
+
+    def on_ex_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_ex_from_table()
 
 
 def main():
