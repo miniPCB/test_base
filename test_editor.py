@@ -24,6 +24,7 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QPushButton,
+    QMenu,
 )
 
 
@@ -134,6 +135,9 @@ class TestEditorWindow(QMainWindow):
         # Left: test list
         self.test_list = QListWidget()
         self.test_list.itemSelectionChanged.connect(self.on_test_selection_changed)
+        # Context menu (right-click) for delete
+        self.test_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.test_list.customContextMenuRequested.connect(self.on_test_list_context_menu)
         splitter.addWidget(self.test_list)
         splitter.setStretchFactor(0, 1)
 
@@ -233,7 +237,7 @@ class TestEditorWindow(QMainWindow):
         return table
 
     def _create_right_panels(self, tabs: QTabWidget):
-        # Revision history first
+        # Revision history
         self.rh_table = self._create_table_tab(
             tabs, "Revisions", RH_COLUMNS, self.on_rh_cell_changed
         )
@@ -343,6 +347,27 @@ class TestEditorWindow(QMainWindow):
         self.test_list.addItem(item)
         self.test_list.setCurrentItem(item)
 
+    def _clear_current_test_view(self):
+        """Clear all form fields, tables, and preview."""
+        self._suppress_updates = True
+        for widget in self.field_edits.values():
+            if isinstance(widget, QLineEdit):
+                widget.clear()
+            elif isinstance(widget, QTextEdit):
+                widget.clear()
+        self.keywords_edit.clear()
+        for table in (
+            self.rh_table,
+            self.tp_table,
+            self.eq_table,
+            self.ms_table,
+            self.th_table,
+            self.ex_table,
+        ):
+            table.setRowCount(0)
+        self.markdown_view.clear()
+        self._suppress_updates = False
+
     # ----- Folder / file handling -----
 
     def open_folder(self):
@@ -356,6 +381,7 @@ class TestEditorWindow(QMainWindow):
         self.test_list.clear()
         self.current_path = None
         self.current_test = {}
+        self._clear_current_test_view()
         self._suppress_updates = True
 
         for path in sorted(folder.glob("*.json")):
@@ -423,6 +449,65 @@ class TestEditorWindow(QMainWindow):
 
         self._suppress_updates = False
 
+    # ----- Context menu on test list -----
+
+    def on_test_list_context_menu(self, pos):
+        """Right-click context menu for deleting a test + file."""
+        item = self.test_list.itemAt(pos)
+        if not item:
+            return
+
+        menu = QMenu(self)
+        delete_act = menu.addAction("Delete Test")
+        action = menu.exec(self.test_list.viewport().mapToGlobal(pos))
+        if action == delete_act:
+            self._delete_test_item(item)
+
+    def _delete_test_item(self, item: QListWidgetItem):
+        path_str = item.data(Qt.ItemDataRole.UserRole)
+        label = item.text()
+        if not path_str:
+            return
+        path = Path(path_str)
+
+        reply = QMessageBox.question(
+            self,
+            "Delete Test",
+            f"Delete test:\n{label}\n\nThis will delete the JSON file:\n{path.name}\n\nAre you sure?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        # Delete JSON file
+        try:
+            if path.exists():
+                path.unlink()
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Error",
+                f"Failed to delete file:\n{path}\n\n{e}",
+            )
+            return
+
+        # Remove from list
+        row = self.test_list.row(item)
+        self.test_list.takeItem(row)
+
+        # If this was the current test, clear editor
+        if self.current_path and path == self.current_path:
+            self.current_path = None
+            self.current_test = {}
+            self._clear_current_test_view()
+
+        # Select a neighbor, if any remain
+        count = self.test_list.count()
+        if count > 0:
+            new_row = min(row, count - 1)
+            self.test_list.setCurrentRow(new_row)
+
     # ----- New Test -----
 
     def new_test(self):
@@ -435,7 +520,6 @@ class TestEditorWindow(QMainWindow):
             )
             return
 
-        # Simple template for a new test
         next_no = self._suggest_next_test_no()
         new_test = {
             "test_name": "",
@@ -540,7 +624,6 @@ class TestEditorWindow(QMainWindow):
         if self._suppress_updates or not self.current_test:
             return
         self.current_test[key] = value
-        # Live update of markdown
         self.markdown_view.setPlainText(build_markdown_from_test(self.current_test))
 
     def on_keywords_changed(self):
@@ -553,7 +636,6 @@ class TestEditorWindow(QMainWindow):
     # ----- Populate tables from test dict -----
 
     def _populate_tables_from_test(self, test: dict):
-        # Helper to fill one table from an array of dicts
         def fill_table(table: QTableWidget, cols: list[str], rows: list[dict]):
             table.blockSignals(True)
             table.setRowCount(0)

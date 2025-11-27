@@ -1,7 +1,7 @@
 {
-  "test_name": "This is a new test",
+  "test_name": "Test Name Wow",
   "test_no": "009",
-  "last_test_no": "008",
+  "last_test_no": "",
   "purpose": "",
   "scope": "",
   "setup": "",
@@ -12,17 +12,12 @@
   "revision_history": [
     {
       "rev": "-",
-      "rev_date": "20251127",
+      "rev_date": "",
       "description": "Initial release",
-      "rev_by": "N. Manteufel"
+      "rev_by": ""
     }
   ],
-  "keywords": [
-    "One",
-    "Word",
-    "Per",
-    "Line"
-  ],
+  "keywords": [],
   "testpoints": [],
   "measurement_equipment": [],
   "measurement_settings": [],
