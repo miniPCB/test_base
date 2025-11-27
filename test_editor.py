@@ -56,6 +56,7 @@ def build_markdown_from_test(test: dict) -> str:
     lines.append("## Conclusion")
     lines.append(g("conclusion"))
     lines.append("")
+
     # Revision history (simple table)
     rh = test.get("revision_history", [])
     if rh:
@@ -82,6 +83,7 @@ EQ_COLUMNS = ["id", "type", "model", "serial", "location", "notes"]
 MS_COLUMNS = ["equipment_id", "mode", "range", "sampling", "other_settings"]
 TH_COLUMNS = ["parameter", "target_value", "lower_limit", "upper_limit", "units", "notes"]
 EX_COLUMNS = ["type", "description", "data_value", "file_ref", "notes"]
+RH_COLUMNS = ["rev", "rev_date", "description", "rev_by"]
 
 
 class TestEditorWindow(QMainWindow):
@@ -141,7 +143,7 @@ class TestEditorWindow(QMainWindow):
         splitter.addWidget(center_tabs)
         splitter.setStretchFactor(1, 3)
 
-        # Right: variable editors + keywords
+        # Right: revision history + variable editors + keywords
         right_tabs = QTabWidget()
         self._create_right_panels(right_tabs)
         splitter.addWidget(right_tabs)
@@ -188,8 +190,13 @@ class TestEditorWindow(QMainWindow):
         self.markdown_view.setReadOnly(True)
         tabs.addTab(self.markdown_view, "Markdown Preview")
 
-    def _create_table_tab(self, parent_tabs: QTabWidget, title: str, columns: list[str],
-                          cell_changed_handler):
+    def _create_table_tab(
+        self,
+        parent_tabs: QTabWidget,
+        title: str,
+        columns: list[str],
+        cell_changed_handler,
+    ):
         """Helper to create a tab with a table and add/remove buttons."""
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -216,12 +223,21 @@ class TestEditorWindow(QMainWindow):
 
         # Connect signals
         table.cellChanged.connect(cell_changed_handler)
-        add_btn.clicked.connect(lambda: self._add_row_to_table(table, columns, cell_changed_handler))
-        del_btn.clicked.connect(lambda: self._delete_row_from_table(table, columns, cell_changed_handler))
+        add_btn.clicked.connect(
+            lambda: self._add_row_to_table(table, columns, cell_changed_handler)
+        )
+        del_btn.clicked.connect(
+            lambda: self._delete_row_from_table(table, columns, cell_changed_handler)
+        )
 
         return table
 
     def _create_right_panels(self, tabs: QTabWidget):
+        # Revision history first
+        self.rh_table = self._create_table_tab(
+            tabs, "Revisions", RH_COLUMNS, self.on_rh_cell_changed
+        )
+
         # Variable tables
         self.tp_table = self._create_table_tab(
             tabs, "Testpoints", TP_COLUMNS, self.on_tp_cell_changed
@@ -272,7 +288,9 @@ class TestEditorWindow(QMainWindow):
         table.removeRow(row)
         self._suppress_updates = False
         # After deletion we resync whole corresponding array from the table
-        if table is self.tp_table:
+        if table is self.rh_table:
+            self._sync_rh_from_table()
+        elif table is self.tp_table:
             self._sync_tp_from_table()
         elif table is self.eq_table:
             self._sync_eq_from_table()
@@ -397,7 +415,7 @@ class TestEditorWindow(QMainWindow):
         keywords = data.get("keywords", [])
         self.keywords_edit.setPlainText("\n".join(keywords))
 
-        # Variable tables
+        # Revision + variable tables
         self._populate_tables_from_test(data)
 
         # Markdown preview
@@ -411,8 +429,9 @@ class TestEditorWindow(QMainWindow):
         """Create a new in-memory test using the TestBASE template."""
         if not self.current_folder:
             QMessageBox.information(
-                self, "No Folder Open",
-                "Please open a test folder first (File → Open Test Folder…)."
+                self,
+                "No Folder Open",
+                "Please open a test folder first (File → Open Test Folder…).",
             )
             return
 
@@ -434,7 +453,7 @@ class TestEditorWindow(QMainWindow):
                     "rev": "-",
                     "rev_date": "",
                     "description": "Initial release",
-                    "rev_by": ""
+                    "rev_by": "",
                 }
             ],
             "keywords": [],
@@ -442,7 +461,7 @@ class TestEditorWindow(QMainWindow):
             "measurement_equipment": [],
             "measurement_settings": [],
             "acceptance_thresholds": [],
-            "example_data": []
+            "example_data": [],
         }
 
         self.current_test = new_test
@@ -461,7 +480,6 @@ class TestEditorWindow(QMainWindow):
                 widget.setPlainText(value)
 
         self.keywords_edit.setPlainText("")
-        # Clear tables
         self._populate_tables_from_test(new_test)
         self.markdown_view.setPlainText(build_markdown_from_test(new_test))
 
@@ -476,12 +494,14 @@ class TestEditorWindow(QMainWindow):
 
         if not self.current_folder:
             QMessageBox.information(
-                self, "No Folder",
-                "Please open a test folder first (File → Open Test Folder…)."
+                self,
+                "No Folder",
+                "Please open a test folder first (File → Open Test Folder…).",
             )
             return
 
-        # Sync variable arrays from tables into the dict
+        # Sync arrays from tables into the dict
+        self._sync_rh_from_table()
         self._sync_tp_from_table()
         self._sync_eq_from_table()
         self._sync_ms_from_table()
@@ -545,6 +565,7 @@ class TestEditorWindow(QMainWindow):
                     table.setItem(row, c, QTableWidgetItem(str(value)))
             table.blockSignals(False)
 
+        fill_table(self.rh_table, RH_COLUMNS, test.get("revision_history", []))
         fill_table(self.tp_table, TP_COLUMNS, test.get("testpoints", []))
         fill_table(self.eq_table, EQ_COLUMNS, test.get("measurement_equipment", []))
         fill_table(self.ms_table, MS_COLUMNS, test.get("measurement_settings", []))
@@ -568,32 +589,54 @@ class TestEditorWindow(QMainWindow):
                 rows_data.append(row_dict)
         return rows_data
 
+    def _sync_rh_from_table(self):
+        if not self.current_test:
+            return
+        self.current_test["revision_history"] = self._sync_array_from_table(
+            self.rh_table, RH_COLUMNS
+        )
+
     def _sync_tp_from_table(self):
         if not self.current_test:
             return
-        self.current_test["testpoints"] = self._sync_array_from_table(self.tp_table, TP_COLUMNS)
+        self.current_test["testpoints"] = self._sync_array_from_table(
+            self.tp_table, TP_COLUMNS
+        )
 
     def _sync_eq_from_table(self):
         if not self.current_test:
             return
-        self.current_test["measurement_equipment"] = self._sync_array_from_table(self.eq_table, EQ_COLUMNS)
+        self.current_test["measurement_equipment"] = self._sync_array_from_table(
+            self.eq_table, EQ_COLUMNS
+        )
 
     def _sync_ms_from_table(self):
         if not self.current_test:
             return
-        self.current_test["measurement_settings"] = self._sync_array_from_table(self.ms_table, MS_COLUMNS)
+        self.current_test["measurement_settings"] = self._sync_array_from_table(
+            self.ms_table, MS_COLUMNS
+        )
 
     def _sync_th_from_table(self):
         if not self.current_test:
             return
-        self.current_test["acceptance_thresholds"] = self._sync_array_from_table(self.th_table, TH_COLUMNS)
+        self.current_test["acceptance_thresholds"] = self._sync_array_from_table(
+            self.th_table, TH_COLUMNS
+        )
 
     def _sync_ex_from_table(self):
         if not self.current_test:
             return
-        self.current_test["example_data"] = self._sync_array_from_table(self.ex_table, EX_COLUMNS)
+        self.current_test["example_data"] = self._sync_array_from_table(
+            self.ex_table, EX_COLUMNS
+        )
 
     # ----- Handlers for cell changes (tables -> dict, live) -----
+
+    def on_rh_cell_changed(self, row: int, col: int):
+        if self._suppress_updates or not self.current_test:
+            return
+        self._sync_rh_from_table()
 
     def on_tp_cell_changed(self, row: int, col: int):
         if self._suppress_updates or not self.current_test:
