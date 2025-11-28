@@ -724,7 +724,10 @@ class TestEditorWindow(QMainWindow):
             with self.current_path.open("w", encoding="utf-8") as f:
                 json.dump(self.current_test, f, indent=2, ensure_ascii=False)
             self._add_or_update_list_item_for_current_test()
-            QMessageBox.information(self, "Saved", f"Saved {self.current_path.name}")
+
+            # Optional: quiet status bar message instead of popup
+            self.statusBar().showMessage(f"Saved {self.current_path.name}", 3000)
+
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save {self.current_path}:\n{e}")
 

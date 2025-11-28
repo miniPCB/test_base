@@ -1,0 +1,26 @@
+{
+  "test_name": "Safe To Turn On: Turn It On",
+  "test_no": "004",
+  "last_test_no": "003",
+  "purpose": "Verify the circuit's safety and functionality upon initial power-up, ensuring all components operate correctly without any hazards or failures.",
+  "scope": "Scope includes powering the circuit under controlled conditions, monitoring for any abnormal behavior, and verifying that all components function as intended without any safety hazards.",
+  "setup": "Ensure the circuit is placed on a non-conductive surface, free from any potential hazards. Connect the power supply to the circuit's input terminals, verifying that the voltage setting matches the circuit specifications. Use appropriate safety equipment, such as gloves and goggles, during the setup process. Confirm that all necessary measurement instruments, such as a multimeter, are calibrated and readily accessible for use during the test.",
+  "procedure": "1. Conduct a thorough visual inspection of the circuit to verify that all components are correctly positioned and securely soldered.  \n2. Inspect for any signs of physical damage, including burnt components, cracked solder joints, or loose connections.  \n3. Ensure all safety devices, such as fuses and circuit breakers, are properly installed and operational.  \n4. Use a calibrated multimeter to measure the resistance between each voltage rail and ground, confirming adequate electrical connectivity.  \n5. Record the resistance measurements and check that they fall within the specified acceptable limits.  \n6. Adjust the power supply to the designated voltage level according to the circuit specifications.  \n7. Confirm that the testing area is safe, organized, and devoid of potential hazards.  \n8. Activate the circuit and observe for any immediate anomalies, including unusual noises, smoke, or signs of overheating.  \n9. If the circuit operates normally, proceed to the next testing phase; if any issues arise, immediately power off the circuit and conduct a thorough investigation.",
+  "measurement": "Measure the voltage at each output terminal of the circuit after power-up to ensure it matches the specified voltage levels. Additionally, monitor the current draw to confirm it remains within the expected range during operation.",
+  "acceptancecriteria": "All circuit components must be securely connected with no visible damage. The power supply must be set to the specified voltage level, and all safety devices must be functional. Resistance measurements between each voltage rail and ground must be within specified limits. Upon powering on, the circuit should operate without any immediate issues, such as unusual sounds, smoke, or overheating. Additionally, voltage at each output terminal must match specified levels, and current draw must remain within expected ranges during operation.",
+  "conclusion": "The circuit has been confirmed to be safe for operation, with all connections intact and no visible defects. Resistance measurements between voltage rails and ground were within acceptable limits, and the circuit functioned properly upon power-up, indicating adherence to safety protocols. Subsequent testing phases can now commence.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

@@ -1,0 +1,26 @@
+{
+  "test_name": "Overvoltage Lockout",
+  "test_no": "008",
+  "last_test_no": "007",
+  "purpose": "To verify the circuit's ability to prevent operation under excessive voltage conditions, ensuring protection of components and maintaining system integrity.",
+  "scope": "The scope of this test includes evaluating the circuit's performance under specified overvoltage conditions, identifying the threshold at which the overvoltage lockout activates, and assessing the recovery behavior once normal voltage levels are restored. The test will focus on the circuit's response time, accuracy of the lockout mechanism, and overall reliability in protecting against voltage spikes.",
+  "setup": "Connect the circuit under test to a variable power supply capable of delivering voltages above the specified maximum operating voltage. Ensure all connections are secure and that the circuit is properly grounded. Use an oscilloscope to monitor voltage levels and a multimeter to measure current. Set up a load that simulates normal operating conditions for the circuit. Prepare a means to safely disconnect power in case of failure during testing.",
+  "procedure": "1. Gradually increase the voltage from zero to the specified overvoltage threshold while monitoring the circuit's response using the oscilloscope and multimeter.  \n2. Record the voltage level at which the overvoltage lockout activates, noting the time taken for the lockout to engage.  \n3. Once the lockout is triggered, reduce the voltage back to normal operating levels and observe the circuit's recovery behavior.  \n4. Document the time taken for the circuit to resume normal operation after the voltage is restored.  \n5. Repeat the test multiple times to ensure consistency and reliability of the overvoltage lockout mechanism.  \n6. Analyze the collected data to evaluate the performance of the circuit under overvoltage conditions.",
+  "measurement": "Voltage level at which overvoltage lockout activates, time taken for lockout engagement, time taken for recovery to normal operation after voltage restoration.",
+  "acceptancecriteria": "The overvoltage lockout must activate at or below the specified threshold voltage, with a maximum engagement time of 100 milliseconds. The circuit should recover to normal operation within 200 milliseconds after voltage restoration. Consistency across multiple test iterations is required, with no failures or anomalies observed during the tests.",
+  "conclusion": "The overvoltage lockout test successfully demonstrated the circuit's ability to prevent operation under excessive voltage conditions. The lockout mechanism activated at the specified threshold, with an engagement time within the acceptable limit of 100 milliseconds. Recovery to normal operation was achieved within the required 200 milliseconds after voltage restoration. All test iterations yielded consistent results, confirming the reliability and effectiveness of the overvoltage protection feature.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

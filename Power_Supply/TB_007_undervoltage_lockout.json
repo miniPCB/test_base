@@ -1,0 +1,26 @@
+{
+  "test_name": "Undervoltage Lockout",
+  "test_no": "007",
+  "last_test_no": "006",
+  "purpose": "To verify that the circuit properly disables output when the input voltage falls below the specified undervoltage threshold, ensuring protection against potential damage and maintaining operational integrity.",
+  "scope": "The scope of this test includes evaluating the circuit's response to varying input voltage levels, specifically focusing on the behavior when the voltage drops below the defined undervoltage threshold. It encompasses the assessment of output disablement, recovery behavior, and the verification of protective features to ensure compliance with design specifications.",
+  "setup": "Connect the circuit under test to a variable power supply capable of providing the specified input voltage range. Ensure that the output load is connected as per design specifications. Use a multimeter to monitor the input voltage and an oscilloscope to observe the output response. Set up the necessary safety equipment and ensure all connections are secure before proceeding with the test.",
+  "procedure": "Gradually decrease the input voltage from the nominal level to below the specified undervoltage threshold while monitoring the output state. Record the input voltage at which the output disables. After reaching the undervoltage condition, gradually increase the input voltage back to the nominal level and observe the output state for recovery. Ensure to document the voltage levels and output behavior during both the disable and recovery phases. Repeat the test for multiple cycles to confirm consistent performance.",
+  "measurement": "Input voltage (V) at which output disables and recovers, output state (enabled/disabled), and response time during disable and recovery phases.",
+  "acceptancecriteria": "The output must disable when the input voltage falls below the specified undervoltage threshold and must recover to the enabled state once the input voltage returns to the nominal level. The disable and recovery voltages must be within ±5% of the defined thresholds, and the response time for both disable and recovery phases must not exceed 100 milliseconds.",
+  "conclusion": "The test successfully demonstrated that the circuit disables the output when the input voltage falls below the specified undervoltage threshold, in accordance with the acceptance criteria. The recovery behavior was also verified, confirming that the output returns to the enabled state once the input voltage is restored to nominal levels. All observed values were within the acceptable range, indicating reliable performance and compliance with design specifications.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

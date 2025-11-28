@@ -1,0 +1,26 @@
+{
+  "test_name": "In-Rush Limiter Time Characterization",
+  "test_no": "005",
+  "last_test_no": "004",
+  "purpose": "Determine the time interval between the activation of the limited FET and the subsequent activation of the unlimited FET to ensure proper circuit functionality.",
+  "scope": "The scope of this test includes evaluating the time response characteristics of the in-rush limiter circuit under specified load conditions. It focuses on measuring the delay between the activation of the limited FET and the subsequent activation of the unlimited FET, ensuring that the circuit operates within the designed parameters for safe and effective performance.",
+  "setup": "Connect probe wires to the Source (S), Drain (D), and Gate (G) terminals of each FET, ensuring secure connections for accurate measurements. \nUse four differential probes to measure the Vgs and Vds of each transistor.\nConnect the four differential probes to a four channel scope.\n",
+  "procedure": "1. Power on the circuit and capture the single shot of the FETs turning on.\n3. Using the four-channel oscilloscope, monitor the Vgs and Vds waveforms of both the limited and unlimited FETs.\n4. Record the time at which the limited FET activates and the subsequent time at which the unlimited FET activates.\n5. Calculate the time interval between the two activation events.\n6. Repeat the measurement three times to ensure consistency and reliability of the results.",
+  "measurement": "Measure the time interval (in milliseconds) between the activation of the limited FET and the subsequent activation of the unlimited FET using the oscilloscope's time measurement feature.",
+  "acceptancecriteria": "The time interval between the activation of the limited FET and the unlimited FET must be within the specified range of 10 to 50 milliseconds for the circuit to be considered functional. Measurements should show consistent results across all three trials, with a maximum allowable variation of ±5 milliseconds.",
+  "conclusion": "The test results indicate that the time interval between the activation of the limited FET and the unlimited FET consistently falls within the specified range of 10 to 50 milliseconds across all trials. Variations were within the acceptable limit of ±5 milliseconds, confirming the circuit's functionality and reliability under the tested conditions.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

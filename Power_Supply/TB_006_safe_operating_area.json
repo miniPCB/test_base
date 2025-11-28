@@ -1,0 +1,26 @@
+{
+  "test_name": "Safe Operating Area",
+  "test_no": "006",
+  "last_test_no": "005",
+  "purpose": "To verify that the circuit operates within its specified safe operating area, ensuring reliability and preventing damage under various load conditions.",
+  "scope": "The scope of this test includes evaluating the circuit's performance across a range of operating conditions, including voltage and current limits, to ensure it remains within the defined safe operating area. This assessment will cover both static and dynamic load scenarios, identifying any potential points of failure or degradation in performance.",
+  "setup": "Connect the circuit to a variable power supply, ensuring proper grounding. Use appropriate load resistors to simulate different load conditions. Set up measurement equipment to monitor voltage and current levels during testing. Ensure all connections are secure and verify the circuit is configured according to the schematic before initiating the test.",
+  "procedure": "1. Gradually increase the input voltage from zero to the maximum specified voltage while monitoring the current draw.\n2. Record the voltage and current readings at each increment, ensuring they remain within the defined limits.\n3. Introduce varying load conditions by adjusting the load resistors and repeat the voltage and current measurements.\n4. Observe the circuit's behavior for any signs of instability, overheating, or failure during both static and dynamic load scenarios.\n5. Document any deviations from expected performance and note the conditions under which they occur.\n6. Ensure to return the circuit to a safe state after testing by gradually reducing the input voltage to zero.",
+  "measurement": "Voltage (V) and current (A) readings at specified increments throughout the test, ensuring they remain within the defined safe operating limits.",
+  "acceptancecriteria": "The circuit must operate within the specified voltage and current limits without any signs of instability, overheating, or failure during all load conditions tested. All recorded measurements should remain within the defined safe operating area, with no deviations exceeding acceptable performance thresholds.",
+  "conclusion": "The circuit successfully operated within the specified safe operating area throughout all tested load conditions. All voltage and current measurements remained within defined limits, with no signs of instability, overheating, or failure observed. The test confirms the circuit's reliability and performance under varying operational scenarios, meeting the established acceptance criteria.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

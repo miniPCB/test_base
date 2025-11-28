@@ -1,0 +1,26 @@
+{
+  "test_name": "Safe To Turn On: Power Rail Resistances",
+  "test_no": "003",
+  "last_test_no": "002",
+  "purpose": "To ensure the circuit is safe and ready for operation by confirming proper connections, functionality of components, and absence of faults before applying power. ",
+  "scope": "Verifying the resistance values between each voltage rail and ground to ensure proper electrical connectivity and identify potential short circuits or open connections before powering the circuit.",
+  "setup": "Place the UUT on an ESD controlled lab bench. Connect the multimeter probes to the appropriate test points for measuring resistance between each voltage rail and ground. Ensure all necessary equipment is calibrated and functioning properly before proceeding.",
+  "procedure": "1. Perform a visual inspection of the circuit to ensure all components are correctly placed and securely connected.  \n2. Check for any visible signs of damage, such as burnt components or loose connections.  \n3. Confirm that all safety devices, including fuses and circuit breakers, are installed and functional.  \n4. Measure the resistance between each voltage rail and ground using a calibrated multimeter to ensure proper electrical connectivity.  \n5. Document the resistance values and verify they are within acceptable limits.  \n6. Set the power supply to the specified voltage level as per the circuit requirements.  \n7. Ensure that the testing environment is safe and free from any hazards.  \n8. Power on the circuit and monitor for any immediate issues, such as unusual sounds, smoke, or overheating.  \n9. If the circuit operates without issues, proceed to the next phase of testing; if any faults are detected, power off immediately and investigate the cause.",
+  "measurement": "Resistance values between each voltage rail and ground, ensuring they are within specified limits for safe operation.",
+  "acceptancecriteria": "All circuit components must be securely connected with no visible damage. The power supply must be set to the specified voltage level, and all safety devices must be functional. Resistance measurements between each voltage rail and ground must be within specified limits. Upon powering on, the circuit should operate without any immediate issues, such as unusual sounds, smoke, or overheating.",
+  "conclusion": "The circuit has been confirmed to be safe for operation, with all connections intact and no visible defects. Resistance measurements between voltage rails and ground were within acceptable limits, and the circuit functioned properly upon power-up, indicating adherence to safety protocols. Subsequent testing phases can now commence.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

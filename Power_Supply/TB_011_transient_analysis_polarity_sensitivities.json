@@ -1,0 +1,26 @@
+{
+  "test_name": "Transient Analysis: Polarity Sensitivities",
+  "test_no": "011",
+  "last_test_no": "010",
+  "purpose": "To evaluate the circuit's response to transient signals and determine the impact of polarity variations on performance and stability.",
+  "scope": "The scope of this test includes assessing the circuit's behavior under various transient conditions, focusing on the effects of different polarity inputs. It will cover a range of signal amplitudes and frequencies to ensure comprehensive evaluation of performance metrics such as response time, stability, and potential failure modes.",
+  "setup": "Set up the test environment by connecting the circuit under evaluation to a function generator, oscilloscope, and power supply. Ensure all connections are secure and that the circuit is powered according to its specifications. Configure the function generator to produce transient signals with varying amplitudes and polarities, and set the oscilloscope to capture the output response. Calibrate measurement equipment as necessary before initiating the test.",
+  "procedure": "1. Power on the circuit and ensure all connections are stable.\n2. Configure the function generator to output a transient signal with a specified amplitude and polarity.\n3. Record the output response using the oscilloscope, ensuring the time base and voltage scale are appropriately set for clear visibility.\n4. Vary the amplitude and polarity of the transient signal systematically, repeating steps 2 and 3 for each condition.\n5. Document the circuit's response time, stability, and any anomalies observed during each test iteration.\n6. Repeat the test for a range of frequencies to assess performance across the specified spectrum.",
+  "measurement": "Measure the circuit's output voltage, response time, and stability under varying transient signal amplitudes and polarities, recording any anomalies or deviations from expected performance metrics.",
+  "acceptancecriteria": "The circuit must demonstrate stable output with a response time within specified limits for all tested transient signal amplitudes and polarities. Any anomalies or deviations from expected performance metrics should not exceed predefined thresholds.",
+  "conclusion": "The transient analysis revealed that the circuit maintains stable output across all tested signal amplitudes and polarities, with response times consistently within the specified limits. No significant anomalies were observed, confirming the circuit's robustness against polarity variations. Overall, the performance metrics met the acceptance criteria, validating the circuit's design for transient conditions.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

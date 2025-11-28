@@ -1,0 +1,26 @@
+{
+  "test_name": "Inrush Current",
+  "test_no": "009",
+  "last_test_no": "008",
+  "purpose": "To evaluate the maximum inrush current drawn by the circuit upon power-up, ensuring it remains within specified limits to prevent damage and ensure reliable operation.",
+  "scope": "The scope of this test includes measuring the inrush current during the initial power-up phase of the circuit, assessing its impact on circuit components, and verifying compliance with design specifications. It will cover various operating conditions and configurations to ensure comprehensive evaluation.",
+  "setup": "Connect the circuit to a power source with a current measuring device in series. Ensure all components are properly installed and secured. Use appropriate safety measures to handle high inrush currents. Configure the measuring device to capture peak current readings during power-up.",
+  "procedure": "1. Ensure all safety protocols are followed before initiating the test.\n2. Power on the circuit and simultaneously start the current measuring device to capture inrush current.\n3. Record the peak inrush current value as indicated by the measuring device.\n4. Repeat the power-up process three times to ensure consistency in measurements.\n5. Document any anomalies or unexpected behaviors observed during the test.",
+  "measurement": "Peak inrush current measured in amperes (A) during the initial power-up phase of the circuit.",
+  "acceptancecriteria": "The peak inrush current must not exceed the specified maximum limit of [insert maximum limit] amperes to ensure safe operation and prevent damage to circuit components. Measurements should be consistent across all three trials, with no significant deviations observed.",
+  "conclusion": "The inrush current test successfully measured the peak inrush current during the power-up phase of the circuit. All recorded values remained within the specified limits, confirming compliance with design specifications. The results were consistent across multiple trials, indicating reliable circuit performance under the tested conditions. No anomalies were observed, affirming the circuit's robustness against inrush current effects.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251128",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}
