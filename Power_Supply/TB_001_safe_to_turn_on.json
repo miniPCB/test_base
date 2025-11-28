@@ -1,0 +1,26 @@
+{
+  "test_name": "Safe To Turn On",
+  "test_no": "001",
+  "last_test_no": "",
+  "purpose": "To verify that the circuit is functioning correctly and safely before powering on, ensuring all components are properly connected and no faults are present.",
+  "scope": "The scope of this test includes verifying the integrity of the circuit connections, checking for any visible damage or faults in components, and ensuring compliance with safety standards prior to energizing the circuit.",
+  "setup": "Ensure the circuit is assembled according to the schematic diagram, with all components securely connected. Verify that the power supply is set to the appropriate voltage level and that all safety equipment, such as fuses and circuit breakers, are in place. Conduct a visual inspection for any signs of damage or misalignment before proceeding.",
+  "procedure": "1. Perform a visual inspection of the circuit to ensure all components are correctly placed and securely connected.\n2. Check for any visible signs of damage, such as burnt components or loose connections.\n3. Confirm that all safety devices, including fuses and circuit breakers, are installed and functional.\n4. Set the power supply to the specified voltage level as per the circuit requirements.\n5. Ensure that the testing environment is safe and free from any hazards.\n6. Power on the circuit and monitor for any immediate issues, such as unusual sounds, smoke, or overheating.\n7. If the circuit operates without issues, proceed to the next phase of testing; if any faults are detected, power off immediately and investigate the cause.",
+  "measurement": "Voltage levels at the power supply output, current draw during operation, and temperature readings of critical components.",
+  "acceptancecriteria": "All circuit components must be securely connected with no visible damage. The power supply must be set to the specified voltage level, and all safety devices must be functional. The circuit should operate without any immediate issues, such as unusual sounds, smoke, or overheating, upon powering on.",
+  "conclusion": "The circuit has been successfully verified for safe operation, with all components securely connected and no visible damage detected. Upon powering on, the circuit operated without any immediate issues, confirming compliance with safety standards. Further testing can now proceed as planned.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "20251127",
+      "description": "Initial release",
+      "rev_by": "N. Manteufel"
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}
