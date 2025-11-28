@@ -1,0 +1,26 @@
+{
+  "test_name": "Output Voltages Under Load",
+  "test_no": "006",
+  "last_test_no": "005",
+  "purpose": "",
+  "scope": "",
+  "setup": "",
+  "procedure": "",
+  "measurement": "",
+  "acceptancecriteria": "",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Initial release",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

@@ -1,0 +1,26 @@
+{
+  "test_name": "STTO: Power Rail Resistances",
+  "test_no": "003",
+  "last_test_no": "002",
+  "purpose": "",
+  "scope": "",
+  "setup": "",
+  "procedure": "",
+  "measurement": "",
+  "acceptancecriteria": "",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Initial release",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

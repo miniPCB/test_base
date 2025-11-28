@@ -1,0 +1,26 @@
+{
+  "test_name": "STTO: Visual Inspection",
+  "test_no": "001",
+  "last_test_no": "",
+  "purpose": "",
+  "scope": "",
+  "setup": "",
+  "procedure": "",
+  "measurement": "",
+  "acceptancecriteria": "",
+  "conclusion": "",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Initial release",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}
