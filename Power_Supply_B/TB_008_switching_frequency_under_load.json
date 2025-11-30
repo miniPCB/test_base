@@ -1,0 +1,26 @@
+{
+  "test_name": "Switching Frequency Under Load",
+  "test_no": "008",
+  "last_test_no": "007",
+  "purpose": "To evaluate the circuit's performance by measuring the switching frequency under specified load conditions, ensuring it meets design specifications and operational requirements.",
+  "scope": "The scope of this test includes assessing the circuit's ability to maintain its specified switching frequency while operating under various load conditions. This will involve testing across a range of load values to identify any deviations from expected performance and to ensure compliance with design specifications. The test will focus on the circuit's stability, efficiency, and response time during load variations.",
+  "setup": "Connect the circuit under test to a variable load resistor capable of simulating the desired load conditions. Ensure that the power supply is stable and set to the specified voltage levels. Use an oscilloscope or frequency counter to monitor the switching frequency at the output. Verify all connections and configurations before initiating the test.",
+  "procedure": "1. Set the variable load resistor to the initial load value as specified in the test plan.\n2. Power on the circuit and allow it to stabilize for a predetermined period.\n3. Using the oscilloscope or frequency counter, measure the switching frequency at the output.\n4. Record the frequency reading and the corresponding load value.\n5. Increment the load resistor to the next specified load value and repeat steps 2-4.\n6. Continue this process for all specified load values, ensuring to document any anomalies or deviations observed during testing.\n7. After completing all measurements, analyze the collected data to assess performance against design specifications.",
+  "measurement": "Measure the switching frequency in Hertz (Hz) at the output of the circuit under varying load conditions, ensuring accurate readings are taken at each specified load value.",
+  "acceptancecriteria": "The circuit must maintain a switching frequency within ±5% of the specified design value across all tested load conditions. Any deviation beyond this threshold will be considered a failure, necessitating further investigation and potential redesign.",
+  "conclusion": "The test results indicate that the circuit successfully maintained the specified switching frequency within the acceptable range of ±5% across all tested load conditions. No significant deviations were observed, confirming that the circuit meets the design specifications and operational requirements. Further analysis of the data supports the stability and efficiency of the circuit under varying loads, validating its performance for intended applications.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Initial release",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}

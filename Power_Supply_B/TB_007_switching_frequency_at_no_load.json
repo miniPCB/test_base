@@ -1,0 +1,26 @@
+{
+  "test_name": "Switching Frequency at No Load",
+  "test_no": "007",
+  "last_test_no": "006",
+  "purpose": "To evaluate the circuit's performance by measuring the switching frequency under no load conditions, ensuring it meets design specifications and operational requirements.",
+  "scope": "The scope of this test includes assessing the circuit's switching frequency performance in a no load scenario, identifying any deviations from expected behavior, and ensuring compliance with specified design parameters. This test will focus on the circuit's ability to maintain stable operation without external load influences.",
+  "setup": "Connect the circuit to a power supply set to the specified operating voltage. Ensure that no load is connected to the output terminals. Use an oscilloscope or frequency counter to monitor the switching frequency at the designated test points. Verify that all connections are secure and that the circuit is properly grounded before proceeding with the test.",
+  "procedure": "1. Power on the circuit and allow it to stabilize for a minimum of 5 minutes.\n2. Using the oscilloscope or frequency counter, probe the designated test points to measure the switching frequency.\n3. Record the frequency readings at regular intervals (e.g., every 10 seconds) for a total duration of 1 minute.\n4. Ensure that the measurements are taken under consistent environmental conditions to avoid external influences.\n5. Repeat the measurement process three times to ensure reliability and consistency of results.",
+  "measurement": "The switching frequency measured in Hertz (Hz) at the designated test points during no load conditions.",
+  "acceptancecriteria": "The measured switching frequency must remain within ±5% of the specified design frequency under no load conditions, with consistent readings across all three measurement trials. Any deviation beyond this threshold will be considered a failure of the test.",
+  "conclusion": "The test results indicate that the circuit successfully maintained a stable switching frequency within the acceptable range of ±5% of the specified design frequency under no load conditions. All three measurement trials yielded consistent readings, confirming the circuit's performance aligns with design specifications. No significant deviations were observed, and the circuit demonstrated reliable operation in the absence of external load influences.",
+  "revision_history": [
+    {
+      "rev": "-",
+      "rev_date": "",
+      "description": "Initial release",
+      "rev_by": ""
+    }
+  ],
+  "keywords": [],
+  "testpoints": [],
+  "measurement_equipment": [],
+  "measurement_settings": [],
+  "acceptance_thresholds": [],
+  "example_data": []
+}
